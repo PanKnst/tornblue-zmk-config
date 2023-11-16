@@ -11,26 +11,83 @@
 #include <dt-bindings/zmk/rgb.h>
 
 #define DEFAULT 0
-#define NAVI    1
+#define NAV     3
+#define SYM     7
+#define NUM     6
+// Home row mods macro
+#define HRML(k1,k2,k3) &hm LCTRL k1  &hm LALT k2  &hm LGUI k3
+#define HRMR(k1,k2,k3) &hm RGUI k1  &hm RALT k2  &hm RCTRL k3 
+
+&lt {
+    flavor = "tap-preferred";
+    tapping-term-ms = <150>;
+    quick_tap_ms = <100>;
+};
 
 / {
+    behaviors {
+        hm: home_mods {
+            label = "hold_tap";
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "tap-preferred";
+            tapping-term-ms = <220>;
+            quick-tap-ms = <150>;
+            global-quick-tap;
+            bindings = <&kp>, <&kp>;
+        };
+        ltn: layer_toggle_nav {
+            label = "layer_toggle_nav";
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "tap-preferred";
+            tapping-term-ms = <220>;
+            quick-tap-ms = <150>;
+            global-quick-tap;
+            bindings = <&mo>, <&kp>;
+        };
+    };
+
     keymap {
         compatible = "zmk,keymap";
 
-        default_layer {
-// -----------------------------------------------------------------------------------------
+//        default_layer {
+// ----------------------------------------------------------------------------------------
 // |  TAB |  Q  |  W  |  E  |  R  |  T  |   |  Y  |  U   |  I  |  O  |  P  | BKSP |
 // | CTRL |  A  |  S  |  D  |  F  |  G  |   |  H  |  J   |  K  |  L  |  ;  |  '   |
 // | SHFT |  Z  |  X  |  C  |  V  |  B  |   |  N  |  M   |  ,  |  .  |  /  | ESC  |
 //              | SPC | GUI | LWR | SPC |   | ENT | RSE  | ALT | ENT |
-                        bindings = <
-   &kp TAB   &kp Q &kp W &kp E &kp R &kp T   &kp Y &kp U  &kp I     &kp O   &kp P    &kp BSPC
-   &kp LCTRL &kp A &kp S &kp D &kp F &kp G   &kp H &kp J  &kp K     &kp L   &kp SEMI &kp SQT
-   &kp LSHFT &kp Z &kp X &kp C &kp V &kp B   &kp N &kp M  &kp COMMA &kp DOT &kp FSLH &kp ESC
-        &kp SPACE &kp LGUI &mo 1 &kp SPACE   &rgb_ug RGB_TOG &rgb_ug RGB_EFF &kp RALT &kp RET
-                        >;
+//                        bindings = <
+//   &kp TAB   &kp Q &kp W &kp E &kp R &kp T   &kp Y &kp U  &kp I     &kp O   &kp P    &kp BSPC
+//   &kp LCTRL &kp A &kp S &kp D &kp F &kp G   &kp H &kp J  &kp K     &kp L   &kp SEMI &kp SQT
+//   &kp LSHFT &kp Z &kp X &kp C &kp V &kp B   &kp N &kp M  &kp COMMA &kp DOT &kp FSLH &kp ESC
+//        &kp SPACE &kp LGUI &mo 1 &kp SPACE   &rgb_ug RGB_TOG &rgb_ug RGB_EFF &kp RALT &kp RET
+//                        >;
+//
+//            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN>;
+//        };
+//    };
+//
+//};
 
-            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN>;
+default_layer {
+            bindings = <
+        //╭──────────┬──────────┬──────────┬──────────┬──────────┬──────────╮   ╭──────────┬──────────┬──────────┬──────────┬──────────┬──────────╮
+        //│          │  Q       │  W       │  E       │  R       │  T       │   │  Y       │  U       │  I       │  O       │  P       │
+              &none     &kp Q      &kp W      &kp E      &kp R      &kp T          &kp Y      &kp U      &kp I      &kp O      &kp P       &none
+        //├──────────┼──────────┼──────────┼──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┼──────────┼──────────┼──────────┤
+        //│          │  A       │  S       │  D       │  F       │  G       │   │  H       │  J       │  K       │  L       │ ; :      │
+              &none     &lt 3 A     HRML(S,         D,         F)     &kp G          &kp H      HRMR(J,        K,         L)    &kp SEMI   &none
+        //├──────────┼──────────┼──────────┼──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┼──────────┼──────────┼──────────┤
+        //│          │  Z       │  X       │  C       │  V       │  B       │   │  N       │  M       │ , <      │ . >      │ / ?      │
+              &none     &kp Z      &kp X      &kp C      &kp V      &kp B          &kp N      &kp M      &kp COMMA  &kp DOT    &kp FSLH    &none
+        //╰──────────┴──────────┼──────────┼──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┼──────────┼──────────┴──────────╯
+        // 1234 for testing     │     1    │     2    │  SHIFT   │   ENTER  │   │ SPACE    │  B-SPACE │     3    │    4     │         
+                                    &kp N1    &kp N2   &kp LSHIFT &lt 2 ENTER    &lt 1 SPACE  &kp BSPC &kp N3     &kp N4 
+//                               &lt 3 N1    &lt 7 N2   &kp LSHIFT &lt 2 ENTER    &lt 1 SPACE  &kp BSPC &lt 6 N3     &kp N4 
+
+        //                      ╰──────────┴──────────┴──────────┴──────────╯   ╰──────────┴──────────┴──────────┴──────────╯
+            >;
         };
     };
 
