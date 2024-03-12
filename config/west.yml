@@ -1,10 +1,10 @@
 manifest:
   remotes:
-    - name: PanKnst
-      url-base: https://github.com/PanKnst
+    - name: YiotiCB
+      url-base: https://github.com/YiotiCB
   projects:
     - name: zmk
-      remote: PanKnst
+      remote: YiotiCB
       revision: main
       import: app/west.yml
   self:
