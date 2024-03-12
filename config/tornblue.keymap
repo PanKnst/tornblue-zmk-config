@@ -11,30 +11,136 @@
 #include <dt-bindings/zmk/rgb.h>
 #include "./includes/keys.h"
 
+//Consts
 #define DEFAULT 0
-#define NAVI    1
+#define NAV     3
+#define SYM     2
+#define NUM     6
+
+//Keys for timeless-homerow mods: (https://github.com/urob/zmk-config?tab=readme-ov-file#timeless-homerow-mods)
+#define KEYS_L LT0 LT1 LT2 LT3 LT4 LM0 LM1 LM2 LM3 LM4 LB0 LB1 LB2 LB3 LB4
+#define KEYS_R RT0 RT1 RT2 RT3 RT4 RM0 RM1 RM2 RM3 RM4 RB0 RB1 RB2 RB3 RB4
+#define THUMBS LH0 LH1 LH2 LH3 RH0 RH1 RH2 RH3
+
+// Home row mods macro
+#define HRML(k1,k2,k3) &hmr LCTRL k1  &hmr LALT k2  &hmr LGUI k3
+#define HRMR(k1,k2,k3) &hml RGUI k1  &hml RALT k2  &hml RCTRL k3 
+
+//Layer toggle for thumbs
+&lt {
+    flavor = "tap-preferred";
+    tapping-term-ms = <150>;
+    quick_tap_ms = <100>;
+};
 
 / {
+    behaviors {
+	//Right hand home row
+	hmr: home_mods_right {
+	    label = "hold_tap";
+	    compatible = "zmk,behavior-hold-tap";
+	    #binding-cells = <2>;
+	    flavor = "balanced";
+	    tapping-term-ms = <200>;
+	    quick-tap-ms = <175>;                // repeat on tap-into-hold
+	    require-prior-idle-ms = <150>;
+	    bindings = <&kp>, <&kp>;
+	    hold-trigger-key-positions = <KEYS_L THUMBS>;
+	    hold-trigger-on-release;             // delay positional check until key-release	
+	    };
+
+	//Left hand home row
+	hml: home_mods_left {
+	    label = "hold_tap";
+	    compatible = "zmk,behavior-hold-tap";
+	    #binding-cells = <2>;
+	    flavor = "balanced";
+	    tapping-term-ms = <200>;
+	    quick-tap-ms = <175>;                // repeat on tap-into-hold
+	    require-prior-idle-ms = <150>;
+	    bindings = <&kp>, <&kp>;
+	    hold-trigger-key-positions = <KEYS_R THUMBS>;
+	    hold-trigger-on-release;             // delay positional check until key-release	
+	    };
+        };
     keymap {
         compatible = "zmk,keymap";
 
 default_layer {
             bindings = <
 //╭────────────┬────────────┬────────────┬────────────┬────────────┬────────────╮   ╭────────────┬────────────┬────────────┬────────────┬────────────┬────────────╮
-//│            │  Q         │  W         │  E         │  R         │  T         │   │  Y         │  U         │  I         │  O         │  P         │            │
-     &none       &kp Q        &kp W        &kp E        &kp R        &kp T            &kp Y        &kp U        &kp I        &kp O        &kp P        &none
+//│            │ Q          │ W          │ E          │ R          │ T          │   │ Y          │ U          │ I          │ O          │ P          │            │
+    &none        &kp Q        &kp W        &kp E        &kp R        &kp T            &kp Y        &kp U        &kp I        &kp O        &kp P        &none
 //├────────────┼────────────┼────────────┼────────────┼────────────┼────────────┤   ├────────────┼────────────┼────────────┼────────────┼────────────┼────────────┤
-//│            │  A         │  S         │  D         │  F         │  G         │   │  H         │  J         │  K         │  L         │ ; :        │            │
-     &none        &lt 3 A      HRML(S,          D,          F)       &kp G            &kp H        HRMR(J,          K,           L)       &kp SEMI     &none
+//│            │ A          │ S          │ D          │ F          │ G          │   │ H          │ J          │ K          │ L          │ ; :        │            │
+    &none        &kp A        HRML(S,      D,           F)           &kp G            &kp H        HRMR(J,      K,           L)           &kp SEMI     &none
 //├────────────┼────────────┼────────────┼────────────┼────────────┼────────────┤   ├────────────┼────────────┼────────────┼────────────┼────────────┼────────────┤
-//│            │  Z         │  X         │  C         │  V         │  B         │   │  N         │  M         │ , <        │ . >        │ / ?        │  	  │
-     &none        &kp Z       &kp X        &kp C         &kp V       &kp B            &kp N        &kp M        &kp COMMA    &kp DOT      &kp FSLH     &none
+//│            │ Z          │ X          │ C          │ V          │ B          │   │ N          │ M          │ , <        │ . >        │ / ?        │            │
+    &none        &kp Z        &kp X        &kp C        &kp V        &kp B            &kp N        &kp M        &kp COMMA    &kp DOT      &kp FSLH     &none
 //╰────────────┴────────────┼────────────┼────────────┼────────────┼────────────┤   ├────────────┼────────────┼────────────┼────────────┼────────────┴────────────╯
-//                          │     1      │     2      │  SHIFT     │   ENTER    │   │ SPACE      │  B-SPACE   │     3      │    4       │         
-                              &kp N1       &kp N2       &kp LSHIFT   &lt 2 ENTER     &lt 1 SPACE   &kp BSPC      &kp N3      &kp N4 
+//                          │            │ TAB        │ SHIFT      │ ENTER      │   │ SPACE      │ B-SPACE    │ ESC        │            │         
+                              &none        &kp TAB      &kp LSHIFT   &lt 2 ENTER      &lt 1 SPACE  &kp BSPC     &lt 3 ESC     &none  
 //                          ╰────────────┴────────────┴────────────┴────────────╯   ╰────────────┴────────────┴────────────┴────────────╯
             >;
        };
+
+
+num_layer {
+            bindings = <
+//╭────────────┬────────────┬────────────┬────────────┬────────────┬────────────╮   ╭────────────┬────────────┬────────────┬────────────┬────────────┬────────────╮
+//│            │ 1          │ 2          │ 3          │ 4          │ 5          │   │ 6          │ 7          │ 8          │ 9          │ 0          │            │
+    &none        &kp N1       &kp N2       &kp N3       &kp N4       &kp N5           &kp N6       &kp N7       &kp N8       &kp N9       &kp N0       &none
+//├────────────┼────────────┼────────────┼────────────┼────────────┼────────────┤   ├────────────┼────────────┼────────────┼────────────┼────────────┼────────────┤
+//│            │ F1         │ F2         │ F3         │ F4         │ F5         │   │ F6         │ F7         │ F8         │ F9         │ F10        │            │
+    &none        &kp F1       HRML(F2,     F3,          F4)          &kp F5           &kp F6       HRMR(F7,     F8,          F9)          &kp F10      &none
+//├────────────┼────────────┼────────────┼────────────┼────────────┼────────────┤   ├────────────┼────────────┼────────────┼────────────┼────────────┼────────────┤
+//│            │            │            │            │            │ F11        │   │ F12        │            │            │            │            │            │
+    &none        &none        &none        &none        &none        &kp F11          &kp F12      &none        &none        &none        &none        &none
+//╰────────────┴────────────┼────────────┼────────────┼────────────┼────────────┤   ├────────────┼────────────┼────────────┼────────────┼────────────┴────────────╯
+//                          │            │ TAB        │ SHIFT      │ ENTER      │   │ SPACE      │ B-SPACE    │ ESC        │            │         
+                              &none        &trans       &trans       &trans           &trans       &trans       &trans       &none  
+//                          ╰────────────┴────────────┴────────────┴────────────╯   ╰────────────┴────────────┴────────────┴────────────╯
+            >;
+       };
+
+
+sym_layer {
+            bindings = <
+//╭────────────┬────────────┬────────────┬────────────┬────────────┬────────────╮   ╭────────────┬────────────┬────────────┬────────────┬────────────┬────────────╮
+//│            │ ~          │ @          │ #          │ $          │ %          │   │ ^          │ &          │ *          │ _          │ =          │            │
+    &none        &kp TILDE    &kp AT       &kp NUHS     &kp DLLR     &kp PRCNT        &kp CARET    &kp AMPS     &kp STAR     &kp UNDER    &kp EQUAL    &none
+//├────────────┼────────────┼────────────┼────────────┼────────────┼────────────┤   ├────────────┼────────────┼────────────┼────────────┼────────────┼────────────┤
+//│            │            │ &          │ |          │ !          │ {          │   │ }          │ +          │ -          │ '          │ "          │            │
+    &none        &none        HRML(AMPS,   PIPE,        EXCL)        &kp LBRC         &kp RBRC     HRMR(PLUS,   MINUS,       APOS)        &kp DQT      &none
+//├────────────┼────────────┼────────────┼────────────┼────────────┼────────────┤   ├────────────┼────────────┼────────────┼────────────┼────────────┼────────────┤
+//│            │ `          │            │            │ [          │ (          │   │ )          │ ]          │ <          │ >          │ \          │            │
+    &none        &kp GRAVE    &none        &none        &kp LBKT     &kp LPAR         &kp RPAR     &kp RBKT     &kp LT       &kp GT       &kp BSLH     &none
+//╰────────────┴────────────┼────────────┼────────────┼────────────┼────────────┤   ├────────────┼────────────┼────────────┼────────────┼────────────┴────────────╯
+//                          │            │ TAB        │ SHIFT      │ ENTER      │   │ SPACE      │ B-SPACE    │ ESC        │            │         
+                              &none        &trans       &trans       &trans           &trans       &trans       &trans       &none  
+//                          ╰────────────┴────────────┴────────────┴────────────╯   ╰────────────┴────────────┴────────────┴────────────╯
+            >;
+       };
+
+nav_layer {
+            bindings = <
+//╭────────────┬────────────┬────────────┬────────────┬────────────┬────────────╮   ╭────────────┬────────────┬────────────┬────────────┬────────────┬────────────╮
+//│            │            │            │            │            │            │   │            │            │            │            │            │            │
+    &none        &none        &none        &none        &none        &none            &none        &none        &none        &none        &none        &none
+//├────────────┼────────────┼────────────┼────────────┼────────────┼────────────┤   ├────────────┼────────────┼────────────┼────────────┼────────────┼────────────┤
+//│            │            │ LCTRL      │ LALT       │ LGUI       │            │   │ <          │ J          │ ^          │ >          │            │            │
+    &none        &none        &kp LCTRL    &kp LALT     &kp LGUI     &none            &kp LEFT     &kp DOWN     &kp UP       &kp RIGHT    &none        &none
+//├────────────┼────────────┼────────────┼────────────┼────────────┼────────────┤   ├────────────┼────────────┼────────────┼────────────┼────────────┼────────────┤
+//│            │            │            │            │            │            │   │            │            │            │            │            │            │
+    &none        &none        &none        &none        &none        &none            &none        &none        &none        &none        &none        &none
+//╰────────────┴────────────┼────────────┼────────────┼────────────┼────────────┤   ├────────────┼────────────┼────────────┼────────────┼────────────┴────────────╯
+//                          │            │ TAB        │ SHIFT      │ ENTER      │   │ SPACE      │ B-SPACE    │ ESC        │            │         
+                              &none        &trans       &trans       &trans           &trans       &trans       &trans       &none  
+//                          ╰────────────┴────────────┴────────────┴────────────╯   ╰────────────┴────────────┴────────────┴────────────╯
+            >;
+       };
+
     };
 
 };
+
